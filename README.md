@@ -2,6 +2,8 @@
 
 Wersja polska: [README_PL.md](README_PL.md)
 
+https://www.kaggle.com/datasets/samuelsemaya/e-commerce-customer-churn/data
+
 ## Executive Summary
 
 This project analyzes the customer churn rate in an e-commerce platform and builds a machine learning model to predict churn risk. The business goal is to identify key drivers of customer attrition and enable the retention team to intervene proactively.
