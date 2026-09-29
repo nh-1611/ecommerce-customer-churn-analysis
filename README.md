@@ -76,6 +76,8 @@ Linear relationships between features and the target variable `Churn` were evalu
 
 ## Step 3: Executive Power BI Dashboard
 
+<img width="1302" height="721" alt="image" src="https://github.com/user-attachments/assets/b9a2bfc6-f4ed-4ba7-aa63-d48150551719" />
+
 An operational and analytical dashboard was designed in Power BI, structured into three primary zones:
 
 1. **KPI Scorecard**: Total Customers (3,270), Churn Rate (16.3%), Complaint Rate (28.2%), Average Tenure (10 months).
