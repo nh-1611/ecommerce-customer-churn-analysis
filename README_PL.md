@@ -2,6 +2,8 @@
 
 English version: [README.md](README.md)
 
+https://www.kaggle.com/datasets/samuelsemaya/e-commerce-customer-churn/data 
+
 ## Podsumowanie 
 
 Projekt dotyczy analizy wskaźnika rezygnacji klientów (churn rate) w sklepie e-commerce oraz budowy modelu maszynowego przewidującego ryzyko rezygnacji. Celem biznesowym jest identyfikacja kluczowych czynników wpływających na odchodzenie klientów oraz umożliwienie zespołowi retencji wczesnej interwencji.
