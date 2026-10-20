@@ -1,4 +1,4 @@
-# Analiza i Predykcja Rezygnacji Klientów (Customer Churn) w Sewisie E-Commerce
+# Analiza i Predykcja Rezygnacji Klientów (Customer Churn) w Serwisie E-Commerce
 
 English version: [README.md](README.md)
 
@@ -8,6 +8,10 @@ https://www.kaggle.com/datasets/samuelsemaya/e-commerce-customer-churn/data
 
 Projekt dotyczy analizy historycznej bazy użytkowników serwisu e-commerce ze szczególnym uwzględnieniem wskaźnika rezygnacji oraz budowy modelu uczenia maszynowego przewidującego ryzyko rezygnacji nowych klientów. W celu odzwierciedlenia warunków produkcyjnych wstępna analiza oraz dobór odpowiedniego modelu przebiegał wyłącznie na wstępnie wydzielonych danych treningowych. W przypadku modelu możliwe to było dzięki wykorzystaniu walidacji krzyżowej. Dane testowe traktowane są jako nowa baza klientów, na której przewidywane jest procentowe ryzyko odejścia.
 Celem biznesowym jest identyfikacja kluczowych czynników wpływających na decyzję klienta o odejściu, wskazanie grupy zagrożonych użytkowników oraz umożliwienie zespołowi retencji wczesnej interwencji.
+
+---
+
+## W skrócie
 
 ---
 
@@ -21,7 +25,7 @@ Zbiór danych zawiera informacje o zachowaniach i profilu klientów platformy e-
 - `WarehouseToHome`: Odległość między magazynem a domem klienta w km (numeryczna).
 - `NumberOfDeviceRegistered`: Łączna liczba urządzeń zarejestrowanych przez klienta (numeryczna).
 - `PreferedOrderCat`: Preferowana kategoria zamówień klienta w ostatnim miesiącu (kategoryczna).
-- `SatisfactionScore`: Ocena satysfakcji klienta z obsługi w skali 1–5 (numeryczna).
+- `SatisfactionScore`: Ocena satysfakcji klienta z obsługi w skali 1-5 (numeryczna).
 - `MaritalStatus`: Stan cywilny klienta (kategoryczna).
 - `NumberOfAddress`: Łączna liczba adresów dodanych przez klienta (numeryczna).
 - `Complain`: Informacja, czy w ostatnim miesiącu zgłoszono reklamację (binarna: 0 = nie, 1 = tak).
@@ -37,7 +41,7 @@ Zbiór danych zawiera informacje o zachowaniach i profilu klientów platformy e-
 2. Eksploracyjna analiza danych (EDA), badanie normalności, analiza korelacji, badanie współliniowości, testowanie hipotez (Python)
 3. Stworzenie interaktywnego dashboardu związanego z EDA (Power BI)
 4. Inżynieria cech i przygotowanie danych do modeli ML (Python)
-5. Trening i ewaluacja modeli regresji liniowej, Random Forest i XGBoost (Python)
+5. Trening i ewaluacja modeli regresji logistycznej, Random Forest i XGBoost (Python)
 6. Interpretacja ważności cech (Python)
 7. Predykcja ryzyka odejścia nowej bazy klientów (Python)
 8. Stworzenie interaktywnego dashboardu związanego z predykcją (Power BI)
@@ -112,7 +116,7 @@ Sprawdzono normalność rozkładu, aby w następnych krokach móc dobrać odpowi
 
 Do badania korelacji wykorzystano metodę Spearmana, aby obejść problem braku normalności rozkładu. 
 
->* Najsilniejszym predyktorem rezygnacji jest **staż klienta** (*r* = 0,39), który wykazuje najsilniejszą ujemną korelację z odejściem. Klienci o długim stażu rezygnują znacznie rzadziej, co wskazuje, >że **krytycznym okresem są pierwsze miesiące po rejestracji.**
+>* Najsilniejszym predyktorem rezygnacji jest **staż klienta** (*r* = -0,39), który wykazuje najsilniejszą ujemną korelację z odejściem. Klienci o długim stażu rezygnują znacznie rzadziej, co wskazuje, >że **krytycznym okresem są pierwsze miesiące po rejestracji.**
 >* Kolejnym głównym czynnikiem ryzyka są **reklamacje** (*r* = 0,25). Problemy z obsługą lub produktem bezpośrednio przekładają się na utratę klienta.
 >* **Wyższa kwota zwrotu wiąże się z niższą skłonnością do odejścia** (*r* = -0,17) - programy lojalnościowe skutecznie zatrzymują klientów.
 >* Co ciekawe, **dłuższy czas od ostatniego zamówienia skłania ludzi do pozostania w serwisie (*r* = -0,16).**
@@ -126,6 +130,23 @@ Do badania korelacji wykorzystano metodę Spearmana, aby obejść problem braku 
 ## Krok 5: Testowanie hipotez
 
 Dla zmiennych ciągłych i porządkowych wykorzystano test U-Manna Whitneya, poparty siłą efektu. Dla zmiennych kategorycznych wykorzystano test Chi-Square.
+
+| Hipoteza | Zmienna | Test | Statystyka | p-value | Siła efektu | Interpretacja siły | Wniosek |
+| :---: | :--- | :--- | :---: | :---: | :---: | :---: | :--- |
+| H1 | `Tenure` | U Manna-Whitneya (jednostronny) | U = 803 668 | < 0,001 | r_rb = -0,60 | duży | Odchodzący klienci mają istotnie krótszy staż |
+| H2 | `WarehouseToHome` | U Manna-Whitneya (jednostronny) | U = 451 246 | < 0,001 | r_rb = 0,10 | mały | Odchodzący mieszkają dalej od magazynu, ale efekt jest słaby |
+| H3 | `NumberOfDeviceRegistered` | U Manna-Whitneya (jednostronny) | U = 419 429 | ≈ 1,000 | r_rb = 0,16 | mały | Hipoteza odrzucona: więcej urządzeń mają odchodzący |
+| H3 (dodatkowo) | `NumberOfDeviceRegistered` | Chi² | χ² = 44,84 | < 0,001 | V Craméra = 0,13 | mały | Istotna zależność, w kierunku przeciwnym do założonego |
+| H4 | `PreferedOrderCat` | Chi² | χ² = 149,25 | < 0,001 | V Craméra = 0,23 | mały | Kategoria istotnie związana z churnem |
+| H5 | `SatisfactionScore` | U Manna-Whitneya (jednostronny) | U = 421 993 | ≈ 1,000 | r_rb = 0,16 | mały | Hipoteza odrzucona: wyższa satysfakcja nie chroni przed odejściem |
+| H5 (dodatkowo) | `SatisfactionScore` | Chi² | χ² = 35,61 | < 0,001 | V Craméra = 0,11 | mały | Istotna zależność, kierunek nieintuicyjny |
+| H6 | `MaritalStatus` | Chi² | χ² = 99,73 | < 0,001 | V Craméra = 0,19 | mały | Istotna zależność; osoby w związku małżeńskim odchodzą rzadziej |
+| H7 | `NumberOfAddress` | U Manna-Whitneya (jednostronny) | U = 482 341 | 0,904 | r_rb = 0,04 | znikomy | Brak istotnej różnicy; liczba adresów nie wiąże się z lojalnością |
+| H8 | `Complain` | Chi² | χ² = 168,64 | < 0,001 | V Craméra (= φ) = 0,25 | mały | Klienci z reklamacją odchodzą istotnie częściej |
+| H9 | `DaySinceLastOrder` | U Manna-Whitneya (jednostronny) | U = 628 801,5 | ≈ 1,000 | r_rb = -0,25 | mały | Hipoteza odrzucona: odchodzący mają *mniej* dni od ostatniego zamówienia |
+| H10 | `CashbackAmount` | U Manna-Whitneya (jednostronny) | U = 633 353,5 | < 0,001 | r_rb = -0,26 | mały | Odchodzący mają istotnie niższy cashback |
+
+*oziom istotności α = 0,05.
 
 * H1: Klienci o krótszym stażu (`Tenure`) w serwisie odchodzą częściej niż klienci długoterminowi.
 > * U nowych użytkowników istnieje istotnie większe ryzyko rezygnacji niż u klientów o dłuższym stażu. Sugerowane jest wzmocnienie działań onboardingowych i retencyjnych we wczesnej fazie cyklu życia klienta.
@@ -181,7 +202,7 @@ Przed przystąpieniem do modelowania zakodowano zmienne kategoryczne za pomocą 
 Poprzez stratyfikowaną 5-krotną walidację krzyżową, zbiór treningowy podzielono na 5 równych części z zachowaniem proporcji klasy mniejszościowej (odchodzących klientów). Zapobiega to niestabilności ocen metryk w poszczególnych pętlach. Aby całkowicie wyeliminować ryzyko przecieku danych, wszystkie kroki transformacji, w tym standaryzacja cech numerycznych oraz generowanie sztucznych próbek SMOTE są wykonywane wyłącznie wewnątrz pętli (*pipeline*) walidacji krzyżowej na danych treningowych danego folda.
 
 | Metryka | Regresja logistyczna | Random Forest | XGBoost |
-| :--- | :---: | :---: |
+| :--- | :---: | :---: | :---: |
 | ROC-AUC Score | 0,8819 | 0,9282 | 0,9240 |
 | Recall (Churn = 1) | 0,8053 | 0,7194 | 0,6879 |
 | Precision (Churn = 1) | 0,4350 | 0,6750 | 0,7009|
@@ -232,11 +253,11 @@ Odległość magazynu od domu oraz status cywilny wpływają na logistykę i pro
 
 ## Krok 10: Prognoza ryzyka dla nowej bazy klientów i dashboard w Power BI
 
-Przyjęty model zastosowano na danych testowych, w celu obliczenia ryzyka odejścia oraz wskazania zagrożonych klientów. Przyjęto próg = 0,35, aby wyłonić jak najwięcej użytkowników potencjalnie skłonnych do rezygnacji z serwisu, co podyktowane zostało przewidywalnie rozsądnym kosztem ewentualnych działań.
+Przyjęty model zastosowano na danych testowych, w celu obliczenia ryzyka odejścia oraz wskazania zagrożonych klientów. Przyjęto próg = 0,35, aby wyłonić jak najwięcej użytkowników potencjalnie skłonnych do rezygnacji z serwisu.
 
 <img width="1322" height="738" alt="image" src="https://github.com/user-attachments/assets/3beb2245-c6f7-404b-a6ac-6599077c2deb" />
 
-1. **Wskaźniki:** Wśród 728 klientów, aż **165 jest zagrożonych odejściem**, co przekłada się na 21,5% całej bazy. Średnie Prawdopodobieństwo rezygnacji wśród osób zagrożonych wynosi **71,6%.**
+1. **Wskaźniki:** Wśród 768 klientów, aż **165 jest zagrożonych odejściem**, co przekłada się na 21,5% całej bazy. Średnie Prawdopodobieństwo rezygnacji wśród osób zagrożonych wynosi **71,6%.**
 2. **Prawdopodobieństwo rezygnacji:** Ze 165 zagrożonych użytkowników, aż 75 znajduje się w grupie krytycznego ryzyka (75%-100%).
 3. **Panel filtrów**: Możliwość segmentacji po stanie cywilnym, stażu według grup, preferowanej kategorii zamówień, złożeniu reklamacji oraz ocenie satysfakcji.
 
@@ -265,7 +286,7 @@ Przyjęty model zastosowano na danych testowych, w celu obliczenia ryzyka odejś
 
 ## Rekomendacje biznesowe
 
-Na podstawie przeprowadzonej analizy eksploracyjnej oraz wyników modelu predykcyjnego XGBoost wyznaczono 3 główne filary działań retencyjnych:
+Na podstawie przeprowadzonej analizy eksploracyjnej oraz wyników modelu predykcyjnego Random Forest wyznaczono 3 główne filary działań retencyjnych:
 
 #### 1. Program ochrony nowych klientów (ochrona w okresie pierwszych 0-6 miesięcy)
 * **Problem:** Wskaźnik rezygnacji wśród klientów o stażu do 6 miesięcy wynosi aż **31,5%**, po czym gwałtownie spada w kolejnych miesiącach i latach.
@@ -282,7 +303,11 @@ Na podstawie przeprowadzonej analizy eksploracyjnej oraz wyników modelu predykc
 #### 3. Wdrożenie modelu Random Forest do systemu CRM (automatyczne alerty Churn Risk)
 * **Problem:** Reagowanie dopiero w momencie, gdy klient przestaje kupować, jest zazwyczaj spóźnione.
 * **Działanie:**
-  * Integracja wytrenowanego modelu RandomForest z bazą danych klientów w celu cotygodniowego generowania scoringu prawdopodobieństwa odejścia (*Churn Probability*).
+  * Integracja wytrenowanego modelu Random Forest z bazą danych klientów w celu cotygodniowego generowania scoringu prawdopodobieństwa odejścia (*Churn Probability*).
   * **Automatyzacja działań retencyjnych:**
     * **Ryzyko wysokie (Prawdopodobieństwo > 75%):** Automatyczne przekazanie rekordu do zespołu marketingu/retencji w celu bezpośredniego kontaktu z indywidualną ofertą.
     * **Ryzyko średnie (Prawdopodobieństwo 35%-75%):** Automatyczny wyzwalacz (*trigger*) w systemie wysyłający spersonalizowany kupon rabatowy lub propozycję wyższego cashbacku na preferowaną kategorię produktów.
+   
+---
+
+## Ograniczenia
