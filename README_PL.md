@@ -13,7 +13,7 @@ Celem biznesowym jest identyfikacja kluczowych czynników wpływających na decy
 
 ## W skrócie
 
-**Cel:** zidentyfikować czynniki rezygnacji klientów e-commerce i wskazać zagrożonych klientów w nowej bazie, aby umożliwić zespołowi retencji wczesną interwencję.
+**Cel:** identyfikacja czynników rezygnacji klientów e-commerce i wskazanie zagrożonych klientów w nowej bazie, w celu umożliwienia zespołowi retencji wczesnej interwencji.
 
 **Dane:** publiczny zbiór z Kaggle, 3 941 obserwacji (po czyszczeniu: 2 712 w zbiorze treningowym, 768 w testowym). Rezygnacja w danych historycznych: **16,3%**. Zbiór testowy służy jako symulacja nowej bazy klientów bez znanych decyzji.
 
