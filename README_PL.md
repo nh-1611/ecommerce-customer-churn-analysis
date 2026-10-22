@@ -13,6 +13,38 @@ Celem biznesowym jest identyfikacja kluczowych czynników wpływających na decy
 
 ## W skrócie
 
+**Cel:** zidentyfikować czynniki rezygnacji klientów e-commerce i wskazać zagrożonych klientów w nowej bazie, aby umożliwić zespołowi retencji wczesną interwencję.
+
+**Dane:** publiczny zbiór z Kaggle, 3 941 obserwacji (po czyszczeniu: 2 712 w zbiorze treningowym, 768 w testowym). Rezygnacja w danych historycznych: **16,3%**. Zbiór testowy służy jako symulacja nowej bazy klientów bez znanych decyzji.
+
+**Podejście:** analiza statystyczna (testy hipotez z siłą efektu) → 5-krotna stratyfikowana walidacja krzyżowa w pipeline'ie (SMOTE i skalowanie wewnątrz foldów) → Random Forest po strojeniu → interpretacja (SHAP, ważność cech, regresja logistyczna jako baseline) → predykcja dla nowej bazy → dwa dashboardy w Power BI.
+
+**Model:** Random Forest (wybrany spośród regresji logistycznej, Random Forest i XGBoost).
+
+| Metryka (walidacja krzyżowa, zbiór treningowy) | Wartość |
+| :--- | :---: |
+| ROC-AUC | 0,93 |
+| Recall (churn = 1) | 0,73 |
+| Precision (churn = 1) | 0,68 |
+| F1 (churn = 1) | 0,71 |
+
+Próg decyzyjny: **0,35**
+
+**Predykcja dla nowej bazy:** **165 z 768 klientów (21,5%)** powyżej progu ryzyka, w tym 75 w grupie krytycznej (75-100%).
+
+**Najważniejsze wnioski:**
+- **Staż jest głównym czynnikiem:** w pierwszych 0-6 miesiącach odchodzi 31,5% klientów, a po 2 latach praktycznie żaden (r_rb = -0,60, duży efekt; najsilniejszy wynik z testów).
+- **Reklamacje:** churn 31,0% u klientów ze skargą vs 10,5% bez skargi.
+- **Liczba urządzeń:** churn rośnie z 6,4% (2 urządzenia) do 35,2% (6 urządzeń).
+- **Cechy według SHAP:** staż, stan cywilny (singiel), preferowana kategoria (telefony), cashback.
+- **Zaskakujące wyniki:** wyższa satysfakcja i mniejsza liczba dni od ostatniego zamówienia wiążą się z częstszym odejściem, co prawdopodobnie wynika ze specyfiki zbioru danych.
+
+**Zawartość repozytorium:**
+- `ecommerce_churn_analysis.ipynb`: czyszczenie, EDA, testy hipotez
+- `ecommerce_churn_model.ipynb`: modelowanie, interpretacja, predykcja
+- `ecommerce_churn_analysis_dashboard_pl.pbix`: dashboard analityczny w Power BI
+- `ecommerce_churn_prediction_pl.pbix`: dashboard predykcyjny w Power BI
+  
 ---
 
 ## Zmienne
@@ -46,6 +78,7 @@ Zbiór danych zawiera informacje o zachowaniach i profilu klientów platformy e-
 7. Predykcja ryzyka odejścia nowej bazy klientów (Python)
 8. Stworzenie interaktywnego dashboardu związanego z predykcją (Power BI)
 9. Wnioski i rekomendacje biznesowe
+10. Ograniczenia i dalsze kroki
 
 ---
 
@@ -146,7 +179,7 @@ Dla zmiennych ciągłych i porządkowych wykorzystano test U-Manna Whitneya, pop
 | H9 | `DaySinceLastOrder` | U Manna-Whitneya (jednostronny) | U = 628 801,5 | ≈ 1,000 | r_rb = -0,25 | mały | Hipoteza odrzucona: odchodzący mają *mniej* dni od ostatniego zamówienia |
 | H10 | `CashbackAmount` | U Manna-Whitneya (jednostronny) | U = 633 353,5 | < 0,001 | r_rb = -0,26 | mały | Odchodzący mają istotnie niższy cashback |
 
-*oziom istotności α = 0,05.
+* Poziom istotności α = 0,05.
 
 * H1: Klienci o krótszym stażu (`Tenure`) w serwisie odchodzą częściej niż klienci długoterminowi.
 > * U nowych użytkowników istnieje istotnie większe ryzyko rezygnacji niż u klientów o dłuższym stażu. Sugerowane jest wzmocnienie działań onboardingowych i retencyjnych we wczesnej fazie cyklu życia klienta.
@@ -253,7 +286,9 @@ Odległość magazynu od domu oraz status cywilny wpływają na logistykę i pro
 
 ## Krok 10: Prognoza ryzyka dla nowej bazy klientów i dashboard w Power BI
 
-Przyjęty model zastosowano na danych testowych, w celu obliczenia ryzyka odejścia oraz wskazania zagrożonych klientów. Przyjęto próg = 0,35, aby wyłonić jak najwięcej użytkowników potencjalnie skłonnych do rezygnacji z serwisu.
+Przyjęty model zastosowano na danych testowych w celu obliczenia ryzyka odejścia oraz wskazania zagrożonych klientów. Wyniki **nie zostały** skalibrowane, przez co nie odzwierciedlają, a w większości przypadków wręcz zawyżają prawdopodobieństwa. Na potrzeby projektu potraktowano je jednak jako prawdopodobieństwo rezygnacji.
+
+Przyjęto próg = 0,35, aby wyłonić jak najwięcej użytkowników potencjalnie skłonnych do rezygnacji z serwisu.
 
 <img width="1322" height="738" alt="image" src="https://github.com/user-attachments/assets/3beb2245-c6f7-404b-a6ac-6599077c2deb" />
 
@@ -306,8 +341,35 @@ Na podstawie przeprowadzonej analizy eksploracyjnej oraz wyników modelu predykc
   * Integracja wytrenowanego modelu Random Forest z bazą danych klientów w celu cotygodniowego generowania scoringu prawdopodobieństwa odejścia (*Churn Probability*).
   * **Automatyzacja działań retencyjnych:**
     * **Ryzyko wysokie (Prawdopodobieństwo > 75%):** Automatyczne przekazanie rekordu do zespołu marketingu/retencji w celu bezpośredniego kontaktu z indywidualną ofertą.
-    * **Ryzyko średnie (Prawdopodobieństwo 35%-75%):** Automatyczny wyzwalacz (*trigger*) w systemie wysyłający spersonalizowany kupon rabatowy lub propozycję wyższego cashbacku na preferowaną kategorię produktów.
+    * **Ryzyko średnie (Prawdopodobieństwo 35%-75%):** Automatyczny wyzwalacz w systemie wysyłający spersonalizowany kupon rabatowy lub propozycję wyższego cashbacku na preferowaną kategorię produktów.
    
 ---
 
 ## Ograniczenia
+
+1. **Capping i imputacja przed walidacją krzyżową:** Granice cappingu (IQR) oraz mediany do uzupełniania braków wyznaczono na całym zbiorze treningowym przed walidacją krzyżową, a nie wewnątrz pipeline'u. Powoduje to niewielki wyciek informacji między foldami. Zbioru testowego to nie dotyczy, ponieważ użyto w nim wartości wyliczonych wyłącznie na zbiorze treningowym.
+
+2. **Brak kalibracji prawdopodobieństw:** Wyniki modelu są w projekcie traktowane jako prawdopodobieństwa rezygnacji, jednak nie przeprowadzono ich kalibracji, a model uczono z użyciem SMOTE. Rozkład wyników jest silnie spolaryzowany. Należy je więc interpretować przede wszystkim jako ranking ryzyka klientów, a nie jako rzeczywiste szanse odejścia.
+
+3. **Próg decyzyjny:** Przyjęty próg 0,35 został dobrany na predykcjach z walidacji krzyżowej (out-of-fold) i uzasadniony kosztem działań retencyjnych. Nie przeprowadzono jednak szczegółowej analizy kosztowej (koszt akcji retencyjnej vs wartość utraconego klienta) przez brak takich danych.
+
+4. **Brak oceny modelu na nowej bazie klientów:** Zbiór testowy nie zawiera informacji o rzeczywistej decyzji klientów i służy jako symulacja nowej bazy. Dashboard predykcyjny pokazuje przewidywania, a nie zmierzoną skuteczność. Jakość modelu oszacowano wyłącznie na podstawie walidacji krzyżowej na zbiorze treningowym. W rzeczywistym wdrożeniu konieczny byłby monitoring (porównanie predykcji z faktycznymi rezygnacjami).
+
+5. **Zależności, nie przyczyny:** Analiza korelacji, testów hipotez, współczynników regresji i wartości SHAP pokazuje związki między cechami a rezygnacją, a nie relacje przyczynowe. Część wyników jest nieintuicyjna (np. wyższa satysfakcja i mniejsza liczba dni od ostatniego zamówienia wiążą się z częstszym odejściem) i prawdopodobnie wynika ze specyfiki zbioru danych, a nie z rzeczywistych zachowań klientów.
+
+6. **Zbiór danych:** Projekt oparto na jednym, publicznym zbiorze danych (Kaggle) o ograniczonej liczebności (3 941 obserwacji przed czyszczeniem). Zbiór nie zawiera identyfikatora klienta, więc usuwanie duplikatów opiera się na identyczności wszystkich cech. Imiona i nazwiska na dashboardzie predykcyjnym są syntetyczne.
+
+7. **Strojenie hiperparametrów:** Poprawa po strojeniu Random Forest była niewielka (poprawa F1-Score z 0,70 na 0,71) i mieści się w zakresie zmienności między foldami, więc nie należy jej interpretować jako istotnej różnicy.
+
+8. **Wielokrotne testowanie hipotez:** Przy 10 testach nie zastosowano korekty na wielokrotne testowanie.
+
+---
+
+## Dalsze kroki
+
+- Ocena krzywej kalibracji na predykcjach out-of-fold i zastosowanie kalibracji, aby wyniki mogły być interpretowane jako prawdopodobieństwa.
+- Przeniesienie cappingu i imputacji do pipeline'u walidacji krzyżowej.
+- Dobór progu na podstawie analizy kosztowej i tabeli recall/precision dla różnych progów.
+- Dodanie na dashboardzie głównych czynników ryzyka dla każdego klienta.
+- Monitoring modelu po wdrożeniu: porównanie predykcji z rzeczywistym churnem, kontrola dryfu danych, okresowe ponowne trenowanie.
+- Zweryfikowanie wniosków na innym zbiorze danych lub na danych rzeczywistych.
