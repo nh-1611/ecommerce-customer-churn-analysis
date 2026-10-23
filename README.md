@@ -1,4 +1,4 @@
-# E-Commerce Customer Churn Analysis & Predictive Modeling
+# E-Commerce Customer Churn Analysis & Predictive ML Modeling
 
 Polish version: [README_PL.md](README_PL.md)
 
