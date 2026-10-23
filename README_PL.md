@@ -2,7 +2,7 @@
 
 English version: [README.md](README.md)
 
-https://www.kaggle.com/datasets/samuelsemaya/e-commerce-customer-churn/data 
+*E-commerce Customer Churn*: https://www.kaggle.com/datasets/samuelsemaya/e-commerce-customer-churn/data 
 
 ## O projekcie 
 
@@ -118,18 +118,18 @@ W ramach etapu przygotowania danych wykonano następujące operacje:
 - **Przycinanie wartości odstających:** za pomocą zakresu międzykwartylowego (IQR) wyznaczono dolne i górne granice dla każdej zmiennej, a następnie bazując na nich przycięto wartości odstające. Metoda *cappingu* ma na celu ograniczenie wpływu skrajnych wartości, jednocześnie zachowując informacje o danych. Na zbiorze testowym wykorzystano granice obliczone na danych ze zbioru treningowego.
 - **Mapowanie wartości:** ujednolicono błędnie opisane rekordy.
 
-Po wyczyszczeniu zbiór treningowy liczy 2712 obserwacje, natomiast zbiór testowy 768.
+Po wyczyszczeniu zbiór treningowy liczy 2 712 obserwacji, natomiast zbiór testowy 768.
 
 ---
 
-## Krok 2: Eksploracyjna Analiza Danych (EDA)
+## Krok 3: Eksploracyjna Analiza Danych (EDA)
 
 Przeanalizowano statystyki opisowe dla danych treningowych.
 
-> * Wyczyszczona historyczna baza klientów ma **2712 rekordy.**
+> * Wyczyszczona historyczna baza klientów ma **2 712 rekordów.**
 > * Baza klientów jest niezrównoważona. Z serwisu odchodzi około **16,3%** użytkowników.
 > * Zdecydowana większość cech ciągłych (`Tenure`, `WarehouseToHome`, `NumberOfAddress`, `DaySinceLastOrder`, `CashbackAmount`) wykazuje dodatnią skośność (0,69-0,95). Wartości średnie są zawyżane przez długie prawostronne ogony. Podejrzewany jest brak normalności rozkładu.
-> * Wysokie odchylenie standardowe wskazują na rozbieżność w doświadczeniach klientów, co stanowi kluczowy punkt wyjścia do badania zależności cech z rezygnacją z usług.
+> * Wysokie odchylenie standardowe wskazuje na rozbieżność w doświadczeniach klientów, co stanowi kluczowy punkt wyjścia do badania zależności cech z rezygnacją z usług.
 
 > * Zdecydowanie najliczniejszą grupę stanowią klienci o stażu 0-1 miesiąca. **Ponad 500 użytkowników to zupełnie nowi klienci.**
 > * Większość klientów ma zarejestrowane **3 lub 4 urządzenia**.
@@ -142,13 +142,13 @@ Przeanalizowano statystyki opisowe dla danych treningowych.
 
 ---
 
-## Krok 3: Testowanie normalności
+## Krok 4: Testowanie normalności
 
-Sprawdzono normalność rozkładu, aby w następnych krokach móc dobrać odpowiednie testy do dalszej analizy danych. Przez wzgląd na liczebność obserwacji skorzystano z testu D'Agostino-Pearsona opartego na skośności i kurtozie. Wyniki poparto wykresem kwantyl-kwantyl. Dla każdej zmienna **hipoteza o rozkładzie normalnym została odrzucona.**
+Sprawdzono normalność rozkładu, aby w następnych krokach móc dobrać odpowiednie testy do dalszej analizy danych. Przez wzgląd na liczebność obserwacji skorzystano z testu D'Agostino-Pearsona opartego na skośności i kurtozie. Wyniki poparto wykresem kwantyl-kwantyl. Dla każdej zmiennej **hipoteza o rozkładzie normalnym została odrzucona.**
 
 ---
 
-## Krok 4: Korelacje
+## Krok 5: Korelacje
 
 Do badania korelacji wykorzystano metodę Spearmana, aby obejść problem braku normalności rozkładu. 
 
@@ -163,7 +163,7 @@ Do badania korelacji wykorzystano metodę Spearmana, aby obejść problem braku 
 
 ---
 
-## Krok 5: Testowanie hipotez
+## Krok 6: Testowanie hipotez
 
 Dla zmiennych ciągłych i porządkowych wykorzystano test U-Manna Whitneya, poparty siłą efektu. Dla zmiennych kategorycznych wykorzystano test Chi-Square. Analizę wspomogły wykresy.
 
@@ -191,7 +191,7 @@ Dla zmiennych ciągłych i porządkowych wykorzystano test U-Manna Whitneya, pop
 * H2: Większa odległość magazynu od adresu dostawy klienta (`WarehouseToHome`) wiąże się ze wzrostem wskaźnika odejść.
 > * Odległość magazynu od domu jest istotnie wyższa u klientów odchodzących niż u tych, którzy pozostają w serwisie. Efekt jest jednak słaby, więc znaczenie praktyczne tej cechy jest ograniczone.
  
-* H3: Większa liczba zarejestrowanych urządzeń (`NumberOfRegisteredDevice`) świadczy o przywiązaniu użytkownika do serwisu, co zmniejsza ryzyko rezygnacji w tej grupie.
+* H3: Większa liczba zarejestrowanych urządzeń (`NumberOfRegistered`) świadczy o przywiązaniu użytkownika do serwisu, co zmniejsza ryzyko rezygnacji w tej grupie.
 > * Hipoteza nie została potwierdzona. Liczba zarejestrowanych urządzeń nie wiąże się z większą lojalnością, przeciwnie: wśród klientów o największej liczbie połączonych urządzeń znajduje się największy odsetek odchodzących klientów.
 
 * H4: Klienci, których preferowaną kategorią (`PreferedOrderCat`) jest elektronika charakteryzują się innymi zachowaniami związanymi z odejściem w porównaniu do klientów wybierających bardziej codzienne kategorie (żywność, moda).
@@ -212,12 +212,12 @@ Dla zmiennych ciągłych i porządkowych wykorzystano test U-Manna Whitneya, pop
 * H9: Dłuższy czas, jaki upłynął od ostatniego zamówienia (`DaySinceLastOrder`), zwiększa prawdopodobieństwo, że klient zrezygnuje z serwisu.
 > * Wbrew oczekiwaniom, liczba dni od ostatniego zamówienia jest niższa w grupie klientów, którzy zrezygnowali z serwisu, niż w grupie, która pozostała (efekt mały). Wynik jest nieintuicyjny i prawdopodobnie wynika ze specyfiki zbioru danych, a nie z rzeczywistych zachowań klientów.
 
-* H10: Wyższy zwrot (`CashbackAmount`) skutecznie zatrzymuje użytkownika w serwisie.
+* H10: Wyższy zwrot (`CashbackAmount`) wiąże się z mniejszym prawdopodobieństwem rezygnacji.
 > * Odchodzący klienci charakteryzują się istotnie niższą kwotą cashbacku niż użytkownicy pozostający w serwisie. Sugeruje to, że cashback i aktywność zakupowa mogą wiązać się z lojalnością klienta wobec platformy, więc warto rozważyć dodatkowe działania wzmacniające przywiązanie użytkowników.
 
 ---
 
-## Krok 6: Dashboard analityczny w Power BI
+## Krok 7: Dashboard analityczny w Power BI
 
 <img width="1302" height="707" alt="ecommerce_churn_analysis_dashboard_pl" src="https://github.com/user-attachments/assets/6a765bd0-49b4-40fc-bc91-51fdf5272784" />
 
@@ -232,26 +232,27 @@ Zaprojektowano raport operacyjno-analityczny w Power BI składający się z trze
 
 ---
 
-## Krok 7: Wybór modelu uczenia maszynowego
+## Krok 8: Wybór modelu uczenia maszynowego
 
 Przed przystąpieniem do modelowania zakodowano zmienne kategoryczne za pomocą One-Hot Encoding.
 
-Poprzez stratyfikowaną 5-krotną walidację krzyżową, zbiór treningowy podzielono na 5 równych części z zachowaniem proporcji klasy mniejszościowej (odchodzących klientów). Zapobiega to niestabilności ocen metryk w poszczególnych pętlach. Aby całkowicie wyeliminować ryzyko przecieku danych, wszystkie kroki transformacji, w tym standaryzacja cech numerycznych oraz generowanie sztucznych próbek SMOTE są wykonywane wyłącznie wewnątrz pętli (*pipeline*) walidacji krzyżowej na danych treningowych danego folda. Wyjątkiem są capping i imputacja, wykonane wcześniej na całym zbiorze treningowym.
+Poprzez stratyfikowaną 5-krotną walidację krzyżową, zbiór treningowy podzielono na 5 równych części z zachowaniem proporcji klasy mniejszościowej (odchodzących klientów). Zapobiega to niestabilności ocen metryk w poszczególnych pętlach. Aby ograniczyć ryzyko przecieku danych, wszystkie kroki transformacji, w tym standaryzacja cech numerycznych oraz generowanie sztucznych próbek SMOTE są wykonywane wyłącznie wewnątrz pętli (*pipeline*) walidacji krzyżowej na danych treningowych danego folda. Wyjątkiem są capping i imputacja, wykonane wcześniej na całym zbiorze treningowym.
 
 Wyniki dotyczą walidacji krzyżowej na zbiorze treningowym przy progu 0,5.
+
 | Metryka | Regresja logistyczna | Random Forest | XGBoost |
 | :--- | :---: | :---: | :---: |
 | ROC-AUC Score | 0,8819 | 0,9282 | 0,9240 |
 | Recall (Churn = 1) | 0,8053 | 0,7194 | 0,6879 |
-| Precision (Churn = 1) | 0,4350 | 0,6750 | 0,7009|
+| Precision (Churn = 1) | 0,4350 | 0,6750 | 0,7009 |
 | F1-Score (Churn = 1) | 0,56 | 0,70 | 0,69 |
 
 Porównano ze sobą 3 modele:
 * **Regresja logistyczna** jako najprostszy z modeli służy jako baseline dla algorytmów drzewiastych. Osiąga najwyższy wskaźnik *Recall* (80,53%), co oznacza, że wyłapuje najwięcej odchodzących klientów. Wykazuje jednak bardzo niską *Precision* (43,50%) oraz najniższy *F1-Score* (0,56). W praktyce generuje bardzo dużo fałszywych alarmów, klasyfikując stałych klientów jako zagrożonych odejściem, co podnosi koszty kampanii retencyjnych.
-* **XGBoost** osiąga najwyższą precyzję (70,09%), tworząc najbardziej trafne trafienia, ale odbywa się to kosztem niższego wskaźnika *Recall* (68,79%), czyli przeoczenia większej liczby rzeczywistych odejść. Dodatkowo, Osiąga bardzo wysoki *ROC-AUC* (0,92) oraz *F1-Score* (0,69).
+* **XGBoost** osiąga najwyższą precyzję (70,09%), tworząc najbardziej trafne trafienia, ale odbywa się to kosztem niższego wskaźnika *Recall* (68,79%), czyli przeoczenia większej liczby rzeczywistych odejść. Dodatkowo, ma bardzo wysoki *ROC-AUC* (0,92) oraz *F1-Score* (0,69).
 * **Las losowy (*Random Forest*)** dominuje w głównej metryce oceny jakości ogólnej: *ROC-AUC* (0,93) oraz *F1-Score* (0,70). Utrzymuje najbardziej optymalny balans pomiędzy wykrywaniem odejść (*Recall* = 71,94%) a unikaniem fałszywych alarmów (*Precision* = 67,50%).
 
-Do etapu strojenia hiperparametrów wybrany został ***Random Forest***. W kontekście przeciwdziałania rezygnacjom klientów zależało nam na zminimalizowaniu zarówno kosztów niepodjęcia działań wobec odchodzącego klienta (braki w *Recall*), jak i kosztów niepotrzebnych rabatów wysyłanych do stałych klientów (braki w *Precision*). *Random Forest* zapewnia **optymalny kompromis (najwyższy *F1-Score*)**. Osiągnięcie najwyższego wyniku *ROC-AUC* świadczy o doskonałej zdolności separacji klas przez model niezależnie od przyjętego progu odcięcia, co stanowi idealny fundament pod późniejszy tuning i dostrajanie progu decyzyjnego.
+Do etapu strojenia hiperparametrów wybrany został ***Random Forest***. W kontekście przeciwdziałania rezygnacjom klientów zależało nam na zminimalizowaniu zarówno kosztów niepodjęcia działań wobec odchodzącego klienta (braki w *Recall*), jak i kosztów niepotrzebnych rabatów wysyłanych do stałych klientów (braki w *Precision*). *Random Forest* zapewnia **optymalny kompromis (najwyższy *F1-Score*)**. Osiągnięcie najwyższego wyniku *ROC-AUC* świadczy o dobrej zdolności separacji klas przez model niezależnie od przyjętego progu odcięcia, co stanowi fundament pod późniejszy tuning i dostrajanie progu decyzyjnego.
 
 Macierz pomyłek dla modelu *Random Forest*:
 - True Negative (poprawnie zaklasyfikowani pozostający): 2116
@@ -261,7 +262,7 @@ Macierz pomyłek dla modelu *Random Forest*:
 
 ---
 
-## Krok 8: Szukanie najlepszych parametrów
+## Krok 9: Szukanie najlepszych parametrów
 
 Zidentyfikowano najlepsze parametry dla *Random Forest*:
 
@@ -280,17 +281,17 @@ Macierz pomyłek dla modelu *Random Forest* o polepszonych parametrach:
 - False Positive (fałszywy alarm): 150
 - False Negative (przegapiony churn): 119
 
-## Krok 9: Interpretacja
+## Krok 10: Interpretacja
 * **Ważność cech:** Staż jest zdecydowanie najważniejszą cechą (waga powyżej 0,25). Oznacza to, że staż klienta w firmie ma fundamentalne znaczenie dla przewidywania ryzyka jego odejścia.
-Wysokość cashbacku oraz liczba dni od ostatniego zamówienia zajmują kolejno drugie i trzecie miejsce, co wskazuje, że aktywność zakupowa oraz profity finansowe mocno wiążą się z lojalnością. Odległość magazynu od domu oraz status cywilny wpływają na logistykę i profil demograficzny klienta.
+Wysokość cashbacku zajmuje drugie miejsce, co wskazuje, że profity finansowe mocno wiążą się z lojalnością. Odległość magazynu od domu oraz status cywilny wpływają na logistykę i profil demograficzny klienta.
 * **Interpretacja regresji logistycznej:** Złożenie skargi przez klienta zwiększa szansę jego odejścia aż o 109,2%. Specyficzna kategoria zamawianych produktów (Others) podnosi ryzyko odejścia o około 79,5%. Większa liczba adresów powiązanych z kontem zwiększa ryzyko podjęcia decyzji o rezygnacji o 74,7% (wynik kontrastuje z brakiem zależności w EDA, może być to efekt warunkowy po uwzględnieniu pozostałych cech), a większa liczba zarejestrowanych urządzeń powoduje wzrost o ok. 59,9%. Status singla napędza prawdopodobieństwo rezygnacji o 48,7%. Dni od ostatniego zamówienia wykazuje ujemny wpływ na poziomie -23,8%, jest to nieintuicyjne i spójne z poprzednią analizą.
-* **SHAP:** Wysokie wartości stażu skupiają się po lewej stronie (ujemne wartości SHAP), co oznacza,że długi staż obniża wynik ryzyka. Niskie wartości stażu (kolor niebieski) przesunięte są w prawo, co potwierdza, że nowi klienci są najbardziej narażeni na rezygnację. Wysokie wartości (czerwone punkty) dla bycia singlem oraz preferowania zamówień przez telefon generują dodatnie wartości SHAP, co podnosi wynik ryzyka. Zróżnicowany rozkład punktów przy wysokości cashbacku pokazuje, że umiarkowane i wyższe kwoty cashbacku przesuwają wynik w lewo (obniżają ryzyko). Zgodnie z wcześniejszymi modelami, obecność skarg silnie przesuwa wartości w stronę dodatnią (prawa strona wykresu) i podnosi wynik ryzyka.
+* **SHAP:** Wysokie wartości stażu skupiają się po lewej stronie (ujemne wartości SHAP), co oznacza, że długi staż obniża wynik ryzyka. Niskie wartości stażu (kolor niebieski) przesunięte są w prawo, co potwierdza, że nowi klienci są najbardziej narażeni na rezygnację. Wysokie wartości (czerwone punkty) dla bycia singlem oraz preferowania zamówień przez telefon generują dodatnie wartości SHAP, co podnosi wynik ryzyka. Zróżnicowany rozkład punktów przy wysokości cashbacku pokazuje, że umiarkowane i wyższe kwoty cashbacku przesuwają wynik w lewo (obniżają ryzyko). Zgodnie z wcześniejszymi modelami, obecność skarg silnie przesuwa wartości w stronę dodatnią (prawa strona wykresu) i podnosi wynik ryzyka.
 
 **SHAP i współczynniki regresji opisują zależności w danych, a nie przyczyny rezygnacji.**
 
 ---
 
-## Krok 10: Prognoza ryzyka dla nowej bazy klientów i dashboard w Power BI
+## Krok 11: Prognoza ryzyka dla nowej bazy klientów i dashboard w Power BI
 
 Przyjęty model zastosowano na danych testowych w celu obliczenia ryzyka odejścia oraz wskazania zagrożonych klientów. Wyniki nie zostały skalibrowane, więc mogą nie odzwierciedlać rzeczywistych prawdopodobieństw (możliwe jest ich zawyżenie). Na potrzeby projektu potraktowano je jednak jako prawdopodobieństwo rezygnacji.
 
@@ -312,7 +313,7 @@ Przyjęto próg = 0,35, aby wyłonić jak najwięcej użytkowników potencjalnie
    - Aż **31,5%** klientów odchodzi w ciągu pierwszych **0-6 miesięcy** korzystania z platformy.
    - Po przekroczeniu progu 2 lat (24 miesięcy) wskaźnik rezygnacji spada niemal do **0%**. Lojalność klientów drastycznie rośnie z czasem.
 
-2. **Reklamacja jako główny *trigger* odejścia:**
+2. **Reklamacja jako silny sygnał ostrzegawczy odejścia:**
    - Klienci, którzy zgłosili reklamację, odchodzą ponad **3-krotnie częściej** (31,0%) w porównaniu do osób bez zgłoszeń (10,5%).
    - Reklamacja wykazuje najsilniejszą dodatnią korelację ze zmienną `Churn` (+0,25). Jest to związek statystyczny, a nie dowód, że reklamacja jest przyczyną odejścia.
 
@@ -320,10 +321,11 @@ Przyjęto próg = 0,35, aby wyłonić jak najwięcej użytkowników potencjalnie
    - Wysoki poziom deklarowanej satysfakcji (ocena 5/5) **nie chroni klienta przed odejściem**. Wśród klientów z reklamacją churn rośnie z 19,5% (ocena 1) do 40,0% (ocena 4) i 35,8% (ocena 5), a SHAP przypisuje samej satysfakcji niską wagę.
 
 4. **Liczba urządzeń:**
-   - Wraz ze wzrostem liczby zarejestrowanych urządzeń na koncie wskaźnik *churnu* rośnie od **6,4%** (dla 2 urządzeń) do aż **35,2%** (dla 6 urządzeń). Może to wskazywać na dzielenie konta z innymi użytkownikami lub problemy z ze spójnością doświadczenia użytkownika (UX) na wielu urządzeniach.
+   - Wraz ze wzrostem liczby zarejestrowanych urządzeń na koncie wskaźnik *churnu* rośnie od **6,4%** (dla 2 urządzeń) do aż **35,2%** (dla 6 urządzeń). Może to wskazywać na dzielenie konta z innymi użytkownikami lub problemy ze spójnością doświadczenia użytkownika (UX) na wielu urządzeniach.
 
 5. **Cashback i aktywność zakupowa:**
 Wyższe kwoty cashbacku wiążą się z niższym *churnem*. Liczba dni od ostatniego zamówienia wiąże się z churnem w kierunku nieintuicyjnym: im więcej dni od ostatniego zamówienia, tym niższy *churn*.
+
 ---
 
 ## Rekomendacje biznesowe
@@ -337,7 +339,7 @@ Na podstawie przeprowadzonej analizy eksploracyjnej oraz wyników modelu predykc
   * Przyznawanie spersonalizowanych zachęt i rabatów (**cashback**) w 2. i 4. miesiącu od rejestracji, aby zbudować nawyk regularnych zakupów.
 
 #### 2. Priorytetyzacja obsługi reklamacji (SLA & Recovery Program)
-* **Problem:** Reklamacja jest najsilniejszym jednostkowym zapalnikiem do odejścia - wskaźnik churnu u osób składających reklamację wynosi **31,0%** (wobec 10,5% u pozostałych). Dodatkowo zidentyfikowano "paradoks satysfakcji", gdzie wysokie oceny (5/5) nie chronią przed odejściem, jeśli towarzyszy im nierozwiązana reklamacja (churn sięga wtedy **35,8%**).
+* **Problem:** Reklamacja jest jednym z najsilniejszych sygnałów odejścia - wskaźnik *churnu* u osób składających reklamację wynosi **31,0%** (wobec 10,5% u pozostałych). Dodatkowo zidentyfikowano "paradoks satysfakcji", gdzie wysokie oceny (5/5) nie chronią przed odejściem, jeśli towarzyszy im nierozwiązana reklamacja (churn sięga wtedy **35,8%**).
 * **Działanie:**
   * Wdrożenie automatycznego flagowania w systemie zgłoszeniowym (Helpdesk/CRM) dla reklamacji pochodzących od nowych klientów (staż < 6 miesięcy).
   * Skrócenie czasu reakcji (SLA) dla tych zgłoszeń do maksymalnie 12-24 godzin oraz automatyczne przyznawanie rekompensaty (np. kod rabatowy lub dodatkowy cashback) po zamknięciu zgłoszenia.
@@ -366,7 +368,7 @@ Na podstawie przeprowadzonej analizy eksploracyjnej oraz wyników modelu predykc
 
 6. **Zbiór danych:** Projekt oparto na jednym, publicznym zbiorze danych (Kaggle) o ograniczonej liczebności (3 941 obserwacji przed czyszczeniem). Zbiór nie zawiera identyfikatora klienta, więc usuwanie duplikatów opiera się na identyczności wszystkich cech. Imiona i nazwiska na dashboardzie predykcyjnym są syntetyczne.
 
-7. **Strojenie hiperparametrów:** Poprawa po strojeniu Random Forest była niewielka (poprawa F1-Score z 0,70 na 0,71) i mieści się w zakresie zmienności między foldami, więc nie należy jej interpretować jako istotnej różnicy.
+7. **Strojenie hiperparametrów:** Poprawa po strojeniu Random Forest była niewielka (poprawa F1-Score z 0,70 na 0,71) i prawdopodobnie mieści się w zakresie zmienności między foldami, więc nie należy jej interpretować jako istotnej różnicy.
 
 8. **Wielokrotne testowanie hipotez:** Przy 10 testach nie zastosowano korekty na wielokrotne testowanie.
 
