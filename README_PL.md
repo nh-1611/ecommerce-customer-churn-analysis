@@ -149,10 +149,10 @@ Sprawdzono normalność rozkładu, aby w następnych krokach móc dobrać odpowi
 
 Do badania korelacji wykorzystano metodę Spearmana, aby obejść problem braku normalności rozkładu. 
 
->* Najsilniejszym predyktorem rezygnacji jest **staż klienta** (*r* = -0,39), który wykazuje najsilniejszą ujemną korelację z odejściem. Klienci o długim stażu rezygnują znacznie rzadziej, co wskazuje, >że **krytycznym okresem są pierwsze miesiące po rejestracji.**
->* Kolejnym głównym czynnikiem ryzyka są **reklamacje** (*r* = 0,25). Problemy z obsługą lub produktem bezpośrednio przekładają się na utratę klienta.
->* **Wyższa kwota zwrotu wiąże się z niższą skłonnością do odejścia** (*r* = -0,17) - programy lojalnościowe skutecznie zatrzymują klientów.
->* Co ciekawe, **dłuższy czas od ostatniego zamówienia skłania ludzi do pozostania w serwisie (*r* = -0,16).**
+>* Najsilniejszą zależność z rezygnacją wykazuje **staż klienta** (*r* = -0,39), który charakteryzuje się ujemną korelacją. Klienci o długim stażu rezygnują znacznie rzadziej, co sugeruje, >że **krytycznym okresem mogą być pierwsze miesiące po rejestracji.**
+>* Kolejnym głównym czynnikiem ryzyka mogą być **reklamacje** (*r* = 0,25). Problemy z obsługą lub produktem są powiązane z decyzją o odejściu.
+>* **Wyższa kwota zwrotu wiąże się z niższą skłonnością do odejścia** (*r* = -0,17) - przypuszczalnie programy lojalnościowe skutecznie zatrzymują klientów.
+>* Co ciekawe, **dłuższy czas od ostatniego zamówienia wiąże się z pozostawaniem ludzi w serwisie (*r* = -0,16).**
 >* Liczba zarejestrowanych urządzeń (*r* = 0,11) oraz ocena satysfakcji (*r* = 0,10) wykazują słabą dodatnią korelację z odejściem z serwisu.
 >* Dystans do magazynu (*r* = 0,06) i liczba zapisanych adresów (*r* = 0,03) wykazują znikomą zależność z rezygnacją.
 
@@ -162,7 +162,7 @@ Do badania korelacji wykorzystano metodę Spearmana, aby obejść problem braku 
 
 ## Krok 5: Testowanie hipotez
 
-Dla zmiennych ciągłych i porządkowych wykorzystano test U-Manna Whitneya, poparty siłą efektu. Dla zmiennych kategorycznych wykorzystano test Chi-Square.
+Dla zmiennych ciągłych i porządkowych wykorzystano test U-Manna Whitneya, poparty siłą efektu. Dla zmiennych kategorycznych wykorzystano test Chi-Square. Analizę wspomogły wykresy.
 
 | Hipoteza | Zmienna | Test | Statystyka | p-value | Siła efektu | Interpretacja siły | Wniosek |
 | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :--- |
