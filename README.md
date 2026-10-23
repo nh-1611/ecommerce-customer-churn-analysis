@@ -382,7 +382,3 @@ Based on the exploratory analysis and the results of the Random Forest predictiv
 - Add the main risk drivers for each customer to the dashboard.
 - Monitor the model after deployment: compare predictions with actual churn, track data drift, retrain periodically.
 - Verify the findings on another dataset or on real-world data.
-  * Integrate the trained XGBoost model into the CRM to score active accounts weekly.
-  * **Automated Retention Workflows:**
-    * **High Risk (Probability > 70%):** Flag for direct outbound contact by retention agents with custom offers.
-    * **Medium Risk (Probability 40%–70%):** Trigger automated marketing emails with personalized coupons or bonus cashback on preferred categories.
