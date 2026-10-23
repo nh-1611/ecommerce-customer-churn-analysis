@@ -44,7 +44,10 @@ Próg decyzyjny: **0,35**
 - `ecommerce_churn_model.ipynb`: modelowanie, interpretacja, predykcja
 - `ecommerce_churn_analysis_dashboard_pl.pbix`: dashboard analityczny w Power BI
 - `ecommerce_churn_prediction_pl.pbix`: dashboard predykcyjny w Power BI
-  
+- `requirements.txt`: biblioteki
+
+Jak uruchomić: pip install -r `requirements.txt`, następnie notebooki w kolejności: `ecommerce_churn_analysis.ipynb` → `ecommerce_churn_model.ipynb`. 
+
 ---
 
 ## Zmienne
@@ -77,8 +80,7 @@ Zbiór danych zawiera informacje o zachowaniach i profilu klientów platformy e-
 6. Interpretacja ważności cech (Python)
 7. Predykcja ryzyka odejścia nowej bazy klientów (Python)
 8. Stworzenie interaktywnego dashboardu związanego z predykcją (Power BI)
-9. Wnioski i rekomendacje biznesowe
-10. Ograniczenia i dalsze kroki
+9. Wnioski, rekomendacje biznesowe, ograniczenia i dalsze kroki
 
 ---
 
@@ -92,6 +94,7 @@ Zbiór danych zawiera informacje o zachowaniach i profilu klientów platformy e-
 * `scikit-learn` - podział danych (`train_test_split`), skalowanie (`StandardScaler`), optymalizacja parametrów (`GridSearchCV`), walidacja krzyżowa (`StratifiedKFold`, `cross_validate`) oraz ocena modeli (`classification_report`, `confusion_matrix`, `roc_auc_score`), regresja logistyczna (`LogisticRegression`), las losowy (`RandomForestClassifier`)
 * `imblearn` - obsługa nierównowagi klas (`SMOTE`), budowa potoków przetwarzania (`Pipeline`)
 * `xgboost` (`XGBClassifier`)
+* `shap` - interpretacja modelu
   
 * **Business Intelligence / Raportowanie:** Power BI Desktop
 
@@ -168,48 +171,49 @@ Dla zmiennych ciągłych i porządkowych wykorzystano test U-Manna Whitneya, pop
 | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :--- |
 | H1 | `Tenure` | U Manna-Whitneya (jednostronny) | U = 803 668 | < 0,001 | r_rb = -0,60 | duży | Odchodzący klienci mają istotnie krótszy staż |
 | H2 | `WarehouseToHome` | U Manna-Whitneya (jednostronny) | U = 451 246 | < 0,001 | r_rb = 0,10 | mały | Odchodzący mieszkają dalej od magazynu, ale efekt jest słaby |
-| H3 | `NumberOfDeviceRegistered` | U Manna-Whitneya (jednostronny) | U = 419 429 | ≈ 1,000 | r_rb = 0,16 | mały | Hipoteza odrzucona: więcej urządzeń mają odchodzący |
+| H3 | `NumberOfDeviceRegistered` | U Manna-Whitneya (jednostronny) | U = 419 429 | ≈ 1,000* | r_rb = 0,16 | mały | Hipoteza odrzucona: więcej urządzeń mają odchodzący |
 | H3 (dodatkowo) | `NumberOfDeviceRegistered` | Chi² | χ² = 44,84 | < 0,001 | V Craméra = 0,13 | mały | Istotna zależność, w kierunku przeciwnym do założonego |
 | H4 | `PreferedOrderCat` | Chi² | χ² = 149,25 | < 0,001 | V Craméra = 0,23 | mały | Kategoria istotnie związana z churnem |
-| H5 | `SatisfactionScore` | U Manna-Whitneya (jednostronny) | U = 421 993 | ≈ 1,000 | r_rb = 0,16 | mały | Hipoteza odrzucona: wyższa satysfakcja nie chroni przed odejściem |
+| H5 | `SatisfactionScore` | U Manna-Whitneya (jednostronny) | U = 421 993 | ≈ 1,000* | r_rb = 0,16 | mały | Hipoteza odrzucona: wyższa satysfakcja nie chroni przed odejściem |
 | H5 (dodatkowo) | `SatisfactionScore` | Chi² | χ² = 35,61 | < 0,001 | V Craméra = 0,11 | mały | Istotna zależność, kierunek nieintuicyjny |
 | H6 | `MaritalStatus` | Chi² | χ² = 99,73 | < 0,001 | V Craméra = 0,19 | mały | Istotna zależność; osoby w związku małżeńskim odchodzą rzadziej |
 | H7 | `NumberOfAddress` | U Manna-Whitneya (jednostronny) | U = 482 341 | 0,904 | r_rb = 0,04 | znikomy | Brak istotnej różnicy; liczba adresów nie wiąże się z lojalnością |
 | H8 | `Complain` | Chi² | χ² = 168,64 | < 0,001 | V Craméra (= φ) = 0,25 | mały | Klienci z reklamacją odchodzą istotnie częściej |
-| H9 | `DaySinceLastOrder` | U Manna-Whitneya (jednostronny) | U = 628 801,5 | ≈ 1,000 | r_rb = -0,25 | mały | Hipoteza odrzucona: odchodzący mają *mniej* dni od ostatniego zamówienia |
+| H9 | `DaySinceLastOrder` | U Manna-Whitneya (jednostronny) | U = 628 801,5 | ≈ 1,000* | r_rb = -0,25 | mały | Hipoteza odrzucona: odchodzący mają *mniej* dni od ostatniego zamówienia |
 | H10 | `CashbackAmount` | U Manna-Whitneya (jednostronny) | U = 633 353,5 | < 0,001 | r_rb = -0,26 | mały | Odchodzący mają istotnie niższy cashback |
 
 * Poziom istotności α = 0,05.
+* W testach jednostronnych p ≈ 1,000 oznacza, że różnica ma kierunek przeciwny do hipotezy alternatywnej. Nie jest to brak zależności: przy teście dwustronnym wynik byłby istotny.
 
 * H1: Klienci o krótszym stażu (`Tenure`) w serwisie odchodzą częściej niż klienci długoterminowi.
-> * U nowych użytkowników istnieje istotnie większe ryzyko rezygnacji niż u klientów o dłuższym stażu. Sugerowane jest wzmocnienie działań onboardingowych i retencyjnych we wczesnej fazie cyklu życia klienta.
+> * U nowych użytkowników ryzyko rezygnacji jest istotnie większe niż u klientów o dłuższym stażu (duży efekt). Sugerowane jest wzmocnienie działań onboardingowych i retencyjnych we wczesnej fazie cyklu życia klienta.
   
 * H2: Większa odległość magazynu od adresu dostawy klienta (`WarehouseToHome`) wiąże się ze wzrostem wskaźnika odejść.
-> * Odległość magazynu od domu jest istotnie wyższa u klientów odchodzących niż u tych, którzy pozostają w serwisie. Zależność nie jest silna, lecz potrzebne może być wdrożenie działań w tym zakresie.
+> * Odległość magazynu od domu jest istotnie wyższa u klientów odchodzących niż u tych, którzy pozostają w serwisie. Efekt jest jednak słaby, więc znaczenie praktyczne tej cechy jest ograniczone.
  
 * H3: Większa liczba zarejestrowanych urządzeń (`NumberOfRegisteredDevice`) świadczy o przywiązaniu użytkownika do serwisu, co zmniejsza ryzyko rezygnacji w tej grupie.
-> * Podobnie jak z liczbą adresów, liczba zarejestrowanych urządzeń nie przekłada się na lojalność do serwisu. Wśród klientów o największej liczbie połączonych urządzeń znajduje się największy odsetek odchodzących klientów.
+> * Hipoteza nie została potwierdzona. Liczba zarejestrowanych urządzeń nie wiąże się z większą lojalnością, przeciwnie: wśród klientów o największej liczbie połączonych urządzeń znajduje się największy odsetek odchodzących klientów.
 
 * H4: Klienci, których preferowaną kategorią (`PreferedOrderCat`) jest elektronika charakteryzują się innymi zachowaniami związanymi z odejściem w porównaniu do klientów wybierających bardziej codzienne kategorie (żywność, moda).
-> * Najchętniej wybierana przez klienta kategoria ma istotny wpływ na decyzję o rezygnacji. Osoby kupujący głównie żywność niemal nie rezygnują z serwisu, czego nie można powiedzieć o użytkownikach wybierających telefony komórkowe.
+> * Preferowana kategoria jest istotnie związana z decyzją o rezygnacji. Osoby kupujące głównie żywność niemal nie rezygnują z serwisu, czego nie można powiedzieć o użytkownikach wybierających telefony komórkowe.
 
 * H5: Niższa ocena satysfakcji klienta (`SatisfactionScore`) wiąże się z większym prawdopodobieństwem odejścia.
-> * Wysoka ocena satysfakcji nie zatrzymuje klienta w serwisie. Użytkownicy lepiej oceniający serwis są jednocześnie tymi, którzy zgłaszają skargi, wpływające na ich decyzję o rezygnacji.
+> * Hipoteza nie została potwierdzona: wysoka ocena satysfakcji nie wiąże się z mniejszym churnem, a kierunek zależności jest przeciwny do oczekiwanego. Możliwe wyjaśnienie to współwystępowanie wysokich ocen i reklamacji
 
 * H6: Klienci w związku małżeńskim (`MaritalStatus`) odchodzą rzadziej niż klienci o innym statusie związku.
-> * Status związku ma istotny wpływ na zjawisko rezygnacji wśród klientów. Użytkownicy będący w związkach małżeńskich wykazują większą stabilność i lojalność wobec serwisu, podczas gdy singielki i single wymagają dedykowanych strategii retencyjnych.
+> * Status związku jest istotnie związany z rezygnacją. Użytkownicy będący w związkach małżeńskich wykazują większą stabilność i lojalność wobec serwisu, podczas gdy single wymagają dedykowanych strategii retencyjnych.
 
 * H7: Większa liczba zapisanych adresów (`NumberOfAddress`) świadczy o przywiązaniu użytkownika do serwisu, co zmniejsza ryzyko rezygnacji w tej grupie.
-> * Liczba zapisanych w serwisie adresów nie jest wyższa u klientów, którzy nie decydują się na rezygnację. Oznacza to, że nie wiąże się to realnie ze stabilnością i lojalnością użytkowników, a prawdopodobnie wynika wyłącznie z wygody.
+> * Liczba zapisanych w serwisie adresów nie jest wyższa u klientów, którzy nie decydują się na rezygnację. Nie wiąże się więc ze stabilnością i lojalnością użytkowników, a może wynikać po prostu z wygody.
 
 * H8: Klienci zgłaszający skargi (`Complain`) mają istotnie wyższy wskaźnik rezygnacji niż klienci, którzy ich nie zgłaszają.
-> * Zachowania związane z rezygnacją istotnie różnią się między klientami zgłaszającymi skargi a klientami, którzy nigdy tego nie zrobili. Siła tego związku jest niewielka, lecz istotna. Złoszenie reklamacji jest silnym sygnałem ostrzegawczym. Należy wdrożyć działania dedykowane sprawnemu rozpatrywaniu skarg w celu zatrzymania użytkownika.
+> * Odsetek rezygnacji istotnie różni się między klientami zgłaszającymi skargi a klientami, którzy nigdy tego nie zrobili. Siła tego związku jest niewielka, lecz istotna. Zgłoszenie reklamacji jest silnym sygnałem ostrzegawczym, dlatego warto wdrożyć działania dedykowane sprawnemu rozpatrywaniu skarg.
 
 * H9: Dłuższy czas, jaki upłynął od ostatniego zamówienia (`DaySinceLastOrder`), zwiększa prawdopodobieństwo, że klient zrezygnuje z serwisu.
-> * Wbrew oczekiwaniom, liczba dni od ostatniego zamówienia jest taka sama lub niższa w grupie klientów, którzy zrezygnowali z serwisu niż w grupie, która pozostała. Taki wynik podkreśla, że aktywność nie gwarantuje zatrzymania użytkownika.
+> * Wbrew oczekiwaniom, liczba dni od ostatniego zamówienia jest niższa w grupie klientów, którzy zrezygnowali z serwisu, niż w grupie, która pozostała (efekt mały). Wynik jest nieintuicyjny i prawdopodobnie wynika ze specyfiki zbioru danych, a nie z rzeczywistych zachowań klientów.
 
 * H10: Wyższy zwrot (`CashbackAmount`) skutecznie zatrzymuje użytkownika w serwisie.
-> * Odchodzący klienci charakteryzują się istotnie niższą sumą zwrotu cashback niż użytkownicy pozostający w serwisie. Pozwala to na sformułowanie wniosku, mówiącego że cashback i częste zakupy kształtują lojalność klienta do platformy. W związku z tym, warto rozważyć więcej działań mających na celu zwiększenie przywiązania użytkownika do serwisu.
+> * Odchodzący klienci charakteryzują się istotnie niższą kwotą cashbacku niż użytkownicy pozostający w serwisie. Sugeruje to, że cashback i aktywność zakupowa mogą wiązać się z lojalnością klienta wobec platformy, więc warto rozważyć dodatkowe działania wzmacniające przywiązanie użytkowników.
 
 ---
 
@@ -232,8 +236,9 @@ Zaprojektowano raport operacyjno-analityczny w Power BI składający się z trze
 
 Przed przystąpieniem do modelowania zakodowano zmienne kategoryczne za pomocą One-Hot Encoding.
 
-Poprzez stratyfikowaną 5-krotną walidację krzyżową, zbiór treningowy podzielono na 5 równych części z zachowaniem proporcji klasy mniejszościowej (odchodzących klientów). Zapobiega to niestabilności ocen metryk w poszczególnych pętlach. Aby całkowicie wyeliminować ryzyko przecieku danych, wszystkie kroki transformacji, w tym standaryzacja cech numerycznych oraz generowanie sztucznych próbek SMOTE są wykonywane wyłącznie wewnątrz pętli (*pipeline*) walidacji krzyżowej na danych treningowych danego folda.
+Poprzez stratyfikowaną 5-krotną walidację krzyżową, zbiór treningowy podzielono na 5 równych części z zachowaniem proporcji klasy mniejszościowej (odchodzących klientów). Zapobiega to niestabilności ocen metryk w poszczególnych pętlach. Aby całkowicie wyeliminować ryzyko przecieku danych, wszystkie kroki transformacji, w tym standaryzacja cech numerycznych oraz generowanie sztucznych próbek SMOTE są wykonywane wyłącznie wewnątrz pętli (*pipeline*) walidacji krzyżowej na danych treningowych danego folda. Wyjątkiem są capping i imputacja, wykonane wcześniej na całym zbiorze treningowym.
 
+Wyniki dotyczą walidacji krzyżowej na zbiorze treningowym przy progu 0,5.
 | Metryka | Regresja logistyczna | Random Forest | XGBoost |
 | :--- | :---: | :---: | :---: |
 | ROC-AUC Score | 0,8819 | 0,9282 | 0,9240 |
@@ -250,7 +255,7 @@ Do etapu strojenia hiperparametrów wybrany został ***Random Forest***. W konte
 
 Macierz pomyłek dla modelu *Random Forest*:
 - True Negative (poprawnie zaklasyfikowani pozostający): 2116
-- True Positive (poprawnie wykryty churn): 319
+- True Positive (poprawnie wykryty churn): 318
 - False Positive (fałszywy alarm): 154
 - False Negative (przegapiony churn): 124
 
@@ -277,24 +282,27 @@ Macierz pomyłek dla modelu *Random Forest* o polepszonych parametrach:
 
 ## Krok 9: Interpretacja
 * **Ważność cech:** Staż jest zdecydowanie najważniejszą cechą (waga powyżej 0,25). Oznacza to, że staż klienta w firmie ma fundamentalne znaczenie dla przewidywania ryzyka jego odejścia.
-Wysokość cashbacku oraz liczba dni od ostatniego zamówienia zajmują kolejno drugie i trzecie miejsce, co wskazuje, że aktywność zakupowa oraz profity finansowe mocno wiążą się z lojalnością.
-Odległość magazynu od domu oraz status cywilny wpływają na logistykę i profil demograficzny klienta.
-* **Interpretacja regresji logistycznej:** Złożenie skargi przez klienta zwiększa szansę jego odejścia aż o 109,2%. Specyficzna kategoria zamawianych produktów (Others) podnosi ryzyko odejścia o około 79,5%. Większa liczba adresów powiązanych z kontem zwiększa ryzyko podjęcia decyzji o rezygnacji o 74,7%, a większa liczba zarejestrowanych urządzeń powoduje wzrost o ok. 59,9%. Status singla napędza prawdopodobieństwo rezygnacji o 48,7%. Dni od ostatniego zamówienia wykazuje ujemny wpływ na poziomie -23,8%, co oznacza, że świeża i regularna aktywność zakupowa obniża ryzyko odejścia.
-* **SHAP:** Wysokie wartości stażu skupiają się po lewej stronie (ujemne wartości SHAP), co oznacza, że duży staż klienta silnie chroni przed odejściem. Niskie wartości stażu (kolor niebieski) przesunięte są w prawo, co potwierdza, że nowi klienci są najbardziej podatni na rezygnację. Wysokie wartości (czerwone punkty) dla bycia singlem oraz preferowania zamówień przez telefon generują dodatnie wartości SHAP, co zwiększa ryzyko churnu. Zróżnicowany rozkład punktów przy wysokości cashbacku pokazuje, że umiarkowane i wyższe kwoty cashbacku pomagają zatrzymać klientów (przesunięcie w lewo). Zgodnie z wcześniejszymi modelami, obecność skarg mocno przesuwa wartości w stronę dodatnią (prawa strona wykresu), co drastycznie podnosi prawdopodobieństwo rezygnacji.
+Wysokość cashbacku oraz liczba dni od ostatniego zamówienia zajmują kolejno drugie i trzecie miejsce, co wskazuje, że aktywność zakupowa oraz profity finansowe mocno wiążą się z lojalnością. Odległość magazynu od domu oraz status cywilny wpływają na logistykę i profil demograficzny klienta.
+* **Interpretacja regresji logistycznej:** Złożenie skargi przez klienta zwiększa szansę jego odejścia aż o 109,2%. Specyficzna kategoria zamawianych produktów (Others) podnosi ryzyko odejścia o około 79,5%. Większa liczba adresów powiązanych z kontem zwiększa ryzyko podjęcia decyzji o rezygnacji o 74,7% (wynik kontrastuje z brakiem zależności w EDA, może być to efekt warunkowy po uwzględnieniu pozostałych cech), a większa liczba zarejestrowanych urządzeń powoduje wzrost o ok. 59,9%. Status singla napędza prawdopodobieństwo rezygnacji o 48,7%. Dni od ostatniego zamówienia wykazuje ujemny wpływ na poziomie -23,8%, jest to nieintuicyjne i spójne z poprzednią analizą.
+* **SHAP:** Wysokie wartości stażu skupiają się po lewej stronie (ujemne wartości SHAP), co oznacza,że długi staż obniża wynik ryzyka. Niskie wartości stażu (kolor niebieski) przesunięte są w prawo, co potwierdza, że nowi klienci są najbardziej narażeni na rezygnację. Wysokie wartości (czerwone punkty) dla bycia singlem oraz preferowania zamówień przez telefon generują dodatnie wartości SHAP, co podnosi wynik ryzyka. Zróżnicowany rozkład punktów przy wysokości cashbacku pokazuje, że umiarkowane i wyższe kwoty cashbacku przesuwają wynik w lewo (obniżają ryzyko). Zgodnie z wcześniejszymi modelami, obecność skarg silnie przesuwa wartości w stronę dodatnią (prawa strona wykresu) i podnosi wynik ryzyka.
+
+**SHAP i współczynniki regresji opisują zależności w danych, a nie przyczyny rezygnacji.**
 
 ---
 
 ## Krok 10: Prognoza ryzyka dla nowej bazy klientów i dashboard w Power BI
 
-Przyjęty model zastosowano na danych testowych w celu obliczenia ryzyka odejścia oraz wskazania zagrożonych klientów. Wyniki **nie zostały** skalibrowane, przez co nie odzwierciedlają, a w większości przypadków wręcz zawyżają prawdopodobieństwa. Na potrzeby projektu potraktowano je jednak jako prawdopodobieństwo rezygnacji.
+Przyjęty model zastosowano na danych testowych w celu obliczenia ryzyka odejścia oraz wskazania zagrożonych klientów. Wyniki nie zostały skalibrowane, więc mogą nie odzwierciedlać rzeczywistych prawdopodobieństw (możliwe jest ich zawyżenie). Na potrzeby projektu potraktowano je jednak jako prawdopodobieństwo rezygnacji.
 
 Przyjęto próg = 0,35, aby wyłonić jak najwięcej użytkowników potencjalnie skłonnych do rezygnacji z serwisu.
 
 <img width="1322" height="738" alt="image" src="https://github.com/user-attachments/assets/3beb2245-c6f7-404b-a6ac-6599077c2deb" />
 
-1. **Wskaźniki:** Wśród 768 klientów, aż **165 jest zagrożonych odejściem**, co przekłada się na 21,5% całej bazy. Średnie Prawdopodobieństwo rezygnacji wśród osób zagrożonych wynosi **71,6%.**
-2. **Prawdopodobieństwo rezygnacji:** Ze 165 zagrożonych użytkowników, aż 75 znajduje się w grupie krytycznego ryzyka (75%-100%).
-3. **Panel filtrów**: Możliwość segmentacji po stanie cywilnym, stażu według grup, preferowanej kategorii zamówień, złożeniu reklamacji oraz ocenie satysfakcji.
+1. **Wskaźniki:** Wśród 768 klientów **165 przekracza próg ryzyka**, co przekłada się na 21,5% całej bazy. Średni wynik ryzyka wśród tych klientów wynosi **71,6%** (nieskalibrowany).
+2. **Rozkład ryzyka:** Ze 165 zagrożonych użytkowników, aż 75 znajduje się w grupie krytycznego ryzyka (75%-100%).
+3. **Lista klientów i karta klienta:** klienci posortowani malejąco według wyniku ryzyka, wraz ze szczegółami wybranego klienta.
+4. **Panel filtrów**: Możliwość segmentacji po stanie cywilnym, stażu według grup, preferowanej kategorii zamówień, złożeniu reklamacji oraz ocenie satysfakcji.
+5. **Wykres SHAP:** średni wpływ cech na wynik modelu.
 
 ---
 
@@ -306,17 +314,16 @@ Przyjęto próg = 0,35, aby wyłonić jak najwięcej użytkowników potencjalnie
 
 2. **Reklamacja jako główny *trigger* odejścia:**
    - Klienci, którzy zgłosili reklamację, odchodzą ponad **3-krotnie częściej** (31,0%) w porównaniu do osób bez zgłoszeń (10,5%).
-   - Reklamacja wykazuje najsilniejszą dodatnią korelację ze zmienną `Churn` (+0,25).
+   - Reklamacja wykazuje najsilniejszą dodatnią korelację ze zmienną `Churn` (+0,25). Jest to związek statystyczny, a nie dowód, że reklamacja jest przyczyną odejścia.
 
 3. **Paradoks satysfakcji:**
-   - Wysoki poziom deklarowanej satysfakcji (ocena 5/5) **nie chroni klienta przed odejściem**, jeśli w ostatnim czasie złożył on reklamację. Ocena satysfakcji mierzy ogólne wrażenia, ale nierozwiązany problem operacyjny (reklamacja) natychmiast przeważa nad pozytywną opinią.
+   - Wysoki poziom deklarowanej satysfakcji (ocena 5/5) **nie chroni klienta przed odejściem**. Wśród klientów z reklamacją churn rośnie z 19,5% (ocena 1) do 40,0% (ocena 4) i 35,8% (ocena 5), a SHAP przypisuje samej satysfakcji niską wagę.
 
 4. **Liczba urządzeń:**
-   - Wraz ze wzrostem liczby zarejestrowanych urządzeń na koncie wskaźnik churnu rośnie od **6,4%** (dla 2 urządzeń) do aż **35,2%** (dla 6 urządzeń). Może to wskazywać na dzielenie konta z innymi użytkownikami lub problemy z ze spójnością doświadczenia użytkownika (UX) na wielu urządzeniach.
+   - Wraz ze wzrostem liczby zarejestrowanych urządzeń na koncie wskaźnik *churnu* rośnie od **6,4%** (dla 2 urządzeń) do aż **35,2%** (dla 6 urządzeń). Może to wskazywać na dzielenie konta z innymi użytkownikami lub problemy z ze spójnością doświadczenia użytkownika (UX) na wielu urządzeniach.
 
-5. **Wpływ programów retencyjnych (cashback i zamówienia):**
-   - Wyższe kwoty przyznanego cashbacku oraz mniejsza liczba dni od ostatniego zamówienia wykazują ujemną korelację z churnem (~ -0,17). Nagradzanie aktywności skutecznie zatrzymuje klientów w systemie.
-
+5. **Cashback i aktywność zakupowa:**
+Wyższe kwoty cashbacku wiążą się z niższym *churnem*. Liczba dni od ostatniego zamówienia wiąże się z churnem w kierunku nieintuicyjnym: im więcej dni od ostatniego zamówienia, tym niższy *churn*.
 ---
 
 ## Rekomendacje biznesowe
